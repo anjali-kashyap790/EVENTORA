@@ -15,10 +15,8 @@ services:
     build:
       context: ./client/client
       dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=http://localhost:5000/api
     ports:
-      - "80:80"
+      - "5173:5173"
     depends_on:
       - server
     restart: always

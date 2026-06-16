@@ -1,33 +1,18 @@
-# Build stage
-FROM node:20-alpine AS build
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy dependency configuration files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (including devDependencies needed for Vite build/run)
+RUN npm install
 
-# Copy the rest of the application files
+# Copy application files
 COPY . .
 
-# Build-time arguments
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+# Expose Vite's default port
+EXPOSE 5173
 
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM nginx:stable-alpine
-
-# Copy build output to Nginx public directory
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy Nginx configuration file
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Run the Vite development server, binding to 0.0.0.0
+CMD ["npm", "run", "dev", "--", "--host"]
